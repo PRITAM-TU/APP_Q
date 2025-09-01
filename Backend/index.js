@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv=require( 'dotenv');
 const studentsSchema=require('./models/Students.models');
+const GameResult = require('./models/GameResult.models');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect('mongodb+srv://pritamtung03_db_user:R88eXyYTGKS!nY7@cluster0.aj33awq.mongodb.net/User', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -47,40 +48,36 @@ process.on('SIGINT', async () => {
 });
 
 // Routes
-app.post('/login/home/quiz/submit', async (req, res) => {
+app.post('/GameResult', async (req, res) => {
   try {
-    const { answers, result } = req.body;
-    
-    // Create a new quiz result document
-    const quizResult = new QuizResult({
-      score: result.score,
-      total: result.total,
-      percentage: result.percentage,
-      date: result.date || new Date(),
-      answers: answers
-      // If you want to associate with user, you might need to get user info from auth token
-      // userId: req.userId, 
-      // userName: req.userName,
-      // userEmail: req.userEmail
+    const {
+      gameId,
+      gameName,
+      score,
+      totalQuestions,
+      correctAnswers,
+      timeSpent
+    } = req.body;
+
+    const gameResult = new GameResult({
+      gameId,
+      gameName,
+      score,
+      totalQuestions,
+      correctAnswers,
+      timeSpent
     });
-    
-    // Save to database
-    const savedResult = await quizResult.save();
-    
-    // Send response
-    res.json({
-      message: 'Quiz results saved successfully',
-      result: savedResult
+
+    await gameResult.save();
+    res.status(201).json({ 
+      message: 'Game result saved successfully', 
+      data: gameResult 
     });
   } catch (error) {
-    console.error('Error saving quiz results:', error);
-    res.status(500).json({ 
-      message: 'Error saving quiz results',
-      error: error.message 
-    });
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
 //
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
