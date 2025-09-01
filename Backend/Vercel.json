@@ -1,17 +1,93 @@
 {
- "version": 2,
- "builds": [
-  {
-   "src": "index.js",
-   "use": "@vercel/node",
-   "config": { "includeFiles": ["dist/**"] }
-  }
- ],
- "routes": [
-  {
-   "src": "/(.*)",
-   "dest": "index.js",
-    "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
-  }
- ]
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "version": 2,
+    "builds": [
+        {
+            "src": "index.js",
+            "use": "@vercel/node"
+        },
+        {
+            "src": "game-results.js",
+            "use": "@vercel/node"
+        },
+        {
+            "src": "quiz-questions.js",
+            "use": "@vercel/node"
+        },
+        {
+            "src": "auth/*.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/game-results",
+            "dest": "/game-results.js",
+            "methods": ["GET", "POST"]
+        },
+        {
+            "src": "/game-results/(.*)",
+            "dest": "/game-results.js",
+            "methods": ["GET"]
+        },
+        {
+            "src": "/quiz-questions/(.*)",
+            "dest": "/quiz-questions.js",
+            "methods": ["GET", "POST"]
+        },
+        {
+            "src": "/auth/(.*)",
+            "dest": "/auth/$1.js",
+            "methods": ["POST"]
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/index.js",
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        }
+    ],
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "https://app-q-x8e5.vercel.app"
+                },
+                {
+                    "key": "Access-Control-Allow-Methods",
+                    "value": "GET, POST, PUT, DELETE, OPTIONS"
+                },
+                {
+                    "key": "Access-Control-Allow-Headers",
+                    "value": "Content-Type, Authorization, X-Requested-With"
+                },
+                {
+                    "key": "Access-Control-Allow-Credentials",
+                    "value": "true"
+                }
+            ]
+        }
+    ],
+    "functions": {
+        "index.js": {
+            "maxDuration": 30,
+            "memory": 1024
+        },
+        "game-results.js": {
+            "maxDuration": 20,
+            "memory": 1024
+        },
+        "quiz-questions.js": {
+            "maxDuration": 15,
+            "memory": 1024
+        },
+        "auth/*.js": {
+            "maxDuration": 10,
+            "memory": 512
+        }
+    },
+    "env": {
+        "MONGODB_URI": "mongodb+srv://pritamtung03_db_user:<db_password>@cluster0.aj33awq.mongodb.net/User"
+    }
 }
